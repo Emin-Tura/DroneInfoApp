@@ -2,6 +2,9 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import Main from './src/pages/Main';
 import SlideMenu from './src/components/SlideMenu';
+import {enableLatestRenderer} from 'react-native-maps';
+
+enableLatestRenderer();
 
 function App(): JSX.Element {
   return (
