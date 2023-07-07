@@ -63,7 +63,7 @@ function Main(): JSX.Element {
 
   const handlePressLocation = () => {
     // Konum butonuna basıldığında yapılacak işlemler
-    console.log('Konum butonuna basıldı');
+    console.log('Konum butonuna basıldıı');
   };
 
   const handlePressNorth = () => {
