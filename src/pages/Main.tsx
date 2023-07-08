@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
+import {Alert, Dimensions, Image, StyleSheet, View} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Button from '../components/Button';
 
 function Main() {
+  const mapRef = React.useRef(null);
   const handlePressPlus = () => {
     console.log('Plus butonuna basıldı');
   };
@@ -13,38 +14,29 @@ function Main() {
     console.log('Minus butonuna basıldı');
   };
 
-  const handlePressLocation = () => {
-    getCurrentLocation();
-  };
-
+  const handlePressLocation = () => {};
   const handlePressNorth = () => {
     console.log('Kuzey butonuna basıldı');
   };
 
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
+  const [latitude, setLatitude] = useState(39.925533);
+  const [longitude, setLongitude] = useState(32.866287);
+  const [latitudeDelta, setLatitudeDelta] = useState(0.0122);
+  const [longitudeDelta, setLongitudeDelta] = useState(
+    (Dimensions.get('window').width / Dimensions.get('window').height) * 0.012,
+  );
 
-  const [currentLocation, setCurrentLocation] = useState(null);
-
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
-
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      position => {
-        const {latitude, longitude} = position.coords;
-        setCurrentLocation({latitude, longitude});
-      },
-      error => {
-        console.log('Konum alınamadı:', error);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
+  const onChangeValue = (region: any) => {
+    setLatitude(region.latitude);
+    setLongitude(region.longitude);
+    setLatitudeDelta(region.latitudeDelta);
+    setLongitudeDelta(region.longitudeDelta);
+    Alert.alert(JSON.stringify(region));
   };
 
-  const defaultLatitude = 39.925533;
-  const defaultLongitude = 32.866287;
+  useEffect(() => {
+    handlePressLocation();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -52,23 +44,27 @@ function Main() {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         mapType="satellite"
-        region={{
-          latitude: currentLocation?.latitude || defaultLatitude,
-          longitude: currentLocation?.longitude || defaultLongitude,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.0121,
+        onRegionChangeComplete={onChangeValue}
+        initialRegion={{
+          latitude,
+          longitude,
+          latitudeDelta,
+          longitudeDelta,
+        }}
+        ref={mapRef}></MapView>
+      <View
+        style={{
+          top: '50%',
+          left: '50%',
+          marginLeft: -24,
+          marginTop: -48,
+          position: 'absolute',
         }}>
-        {currentLocation && (
-          <Marker coordinate={currentLocation}>
-            <Button
-              onPressPlus={handlePressPlus}
-              onPressMinus={handlePressMinus}
-              onPressLocation={handlePressLocation}
-              onPressNorth={handlePressNorth}
-            />
-          </Marker>
-        )}
-      </MapView>
+        <Image
+          source={require('../assets/icon/marker-icon.png')}
+          style={{width: 48, height: 48}}
+        />
+      </View>
       <View style={styles.buttonContainer}>
         <Button
           onPressPlus={handlePressPlus}
