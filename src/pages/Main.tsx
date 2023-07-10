@@ -1,19 +1,55 @@
 import React, {useEffect, useState, useRef} from 'react';
-import {Alert, Dimensions, Image, StyleSheet, View} from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  Image,
+  StyleSheet,
+  View,
+  PermissionsAndroid,
+} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker, Polyline} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Button from '../components/Button';
 
 function Main() {
   const mapRef = useRef(null);
-  const markerRef = useRef(null);
+  const [currentLatitude, setCurrentLatitude] = useState(0);
+  const [currentLongitude, setCurrentLongitude] = useState(0);
+  const [latitudeDelta, setLatitudeDelta] = useState(0.002);
+  const [longitudeDelta, setLongitudeDelta] = useState(
+    (Dimensions.get('window').width / Dimensions.get('window').height) * 0.002,
+  );
+
+  const [markers, setMarkers] = useState([]);
+
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'İzin Ver',
+          message: 'Uygulama konumunuza erişmek istiyor',
+          buttonNeutral: 'Daha Sonra',
+          buttonNegative: 'İptal',
+          buttonPositive: 'Tamam',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        handlePressLocation();
+      } else {
+        console.log('İzin Verilmedi');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
 
   const handlePressPlus = () => {
     const map = mapRef.current;
     if (map) {
       const region = {
-        latitude,
-        longitude,
+        latitude: currentLatitude,
+        longitude: currentLongitude,
         latitudeDelta: latitudeDelta / 2,
         longitudeDelta: longitudeDelta / 2,
       };
@@ -25,14 +61,15 @@ function Main() {
     const map = mapRef.current;
     if (map) {
       const region = {
-        latitude,
-        longitude,
+        latitude: currentLatitude,
+        longitude: currentLongitude,
         latitudeDelta: latitudeDelta * 2,
         longitudeDelta: longitudeDelta * 2,
       };
       map.animateToRegion(region, 500);
     }
   };
+
   const handlePressLocation = () => {
     Geolocation.getCurrentPosition(
       position => {
@@ -41,8 +78,11 @@ function Main() {
           {
             latitude,
             longitude,
-            latitudeDelta,
-            longitudeDelta,
+            latitudeDelta: 0.002,
+            longitudeDelta:
+              (Dimensions.get('window').width /
+                Dimensions.get('window').height) *
+              0.002,
           },
           1000,
         );
@@ -66,28 +106,20 @@ function Main() {
     }
   };
 
-  const [latitude, setLatitude] = useState(39.925533);
-  const [longitude, setLongitude] = useState(32.866287);
-  const [latitudeDelta, setLatitudeDelta] = useState(0.002);
-  const [longitudeDelta, setLongitudeDelta] = useState(
-    (Dimensions.get('window').width / Dimensions.get('window').height) * 0.002,
-  );
-
-  const [markers, setMarkers] = useState([]);
-
   const onChangeValue = (region: {
     latitude: React.SetStateAction<number>;
     longitude: React.SetStateAction<number>;
     latitudeDelta: React.SetStateAction<number>;
     longitudeDelta: React.SetStateAction<number>;
   }) => {
-    setLatitude(region.latitude);
-    setLongitude(region.longitude);
+    setCurrentLatitude(region.latitude);
+    setCurrentLongitude(region.longitude);
     setLatitudeDelta(region.latitudeDelta);
     setLongitudeDelta(region.longitudeDelta);
   };
 
   useEffect(() => {
+    requestLocationPermission();
     handlePressLocation();
   }, []);
 
@@ -99,8 +131,8 @@ function Main() {
         mapType="satellite"
         onRegionChangeComplete={onChangeValue}
         initialRegion={{
-          latitude,
-          longitude,
+          latitude: currentLatitude,
+          longitude: currentLongitude,
           latitudeDelta,
           longitudeDelta,
         }}
