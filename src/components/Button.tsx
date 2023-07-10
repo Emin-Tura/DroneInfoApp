@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     position: 'absolute',
-    top: -200,
+    top: -225,
   },
   clearButtonInner: {
     backgroundColor: '#C3C0C0',
