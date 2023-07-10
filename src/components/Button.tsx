@@ -1,18 +1,26 @@
 import React from 'react';
-import {TouchableOpacity, StyleSheet, Image, View} from 'react-native';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  View,
+  SafeAreaView,
+} from 'react-native';
 
 interface ButtonProps {
   onPressPlus: () => void;
   onPressMinus: () => void;
   onPressLocation: () => void;
-  onPressNorth: () => void;
+  onPressMarker: () => void;
+  onPressClear: () => void;
 }
 
 const Button: React.FC<ButtonProps> = ({
   onPressPlus,
   onPressMinus,
   onPressLocation,
-  onPressNorth,
+  onPressMarker,
+  onPressClear,
 }) => {
   return (
     <View style={styles.container}>
@@ -40,13 +48,26 @@ const Button: React.FC<ButtonProps> = ({
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.northButton}>
+      <View style={styles.markerButton}>
         <TouchableOpacity
           style={styles.locationButtonInner}
-          onPress={onPressNorth}>
+          onPress={onPressMarker}>
           <Image
-            source={require('../assets/icon/north-icon.png')}
+            source={require('../assets/icon/marker-btn-icon.png')}
             style={styles.locationIcon}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.clearButton}>
+        <TouchableOpacity
+          style={styles.clearButtonInner}
+          onPress={onPressClear}>
+          <Image
+            source={require('../assets/icon/clear-icon.png')}
+            style={{
+              width: 20,
+              height: 20,
+            }}
           />
         </TouchableOpacity>
       </View>
@@ -104,8 +125,21 @@ const styles = StyleSheet.create({
     width: 33,
     height: 33,
   },
-  northButton: {
-    marginTop: 10,
+  markerButton: {
+    marginTop: 5,
+  },
+  clearButton: {
+    position: 'absolute',
+    top: -200,
+  },
+  clearButtonInner: {
+    backgroundColor: '#C3C0C0',
+    borderRadius: 5,
+    padding: 15,
+    width: 45,
+    height: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
