@@ -20,12 +20,10 @@ const SlideMenu = () => {
 
   return (
     <View style={[styles.container, {width: windowWidth * 0.1}]}>
-      <TouchableOpacity style={styles.iconContainer} onPress={handleMenuToggle}>
-        <Image
-          source={require('../assets/icon/menu-icon.png')}
-          style={styles.iconImage}
-        />
-      </TouchableOpacity>
+      <Image
+        source={require('../assets/icon/menu-icon.png')}
+        style={styles.iconImage}
+      />
       <TouchableOpacity style={styles.iconContainer} onPress={handleSettings}>
         <Image
           source={require('../assets/icon/settings-icon.png')}

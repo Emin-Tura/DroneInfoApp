@@ -7,7 +7,12 @@ import {
   View,
   PermissionsAndroid,
 } from 'react-native';
-import MapView, {PROVIDER_GOOGLE, Marker, Polyline} from 'react-native-maps';
+import MapView, {
+  PROVIDER_GOOGLE,
+  Marker,
+  Polyline,
+  Polygon,
+} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import Button from '../components/Button';
 
@@ -21,6 +26,8 @@ function Main() {
   );
 
   const [markers, setMarkers] = useState([]);
+  const [drawingFinished, setDrawingFinished] = useState(false);
+  const [polygonCoordinates, setPolygonCoordinates] = useState([]);
 
   const requestLocationPermission = async () => {
     try {
@@ -102,10 +109,11 @@ function Main() {
         .then((camera: {center: {latitude: any; longitude: any}}) => {
           const {latitude, longitude} = camera.center;
           setMarkers([...markers, {latitude, longitude}]);
+          setPolygonCoordinates([...polygonCoordinates, {latitude, longitude}]);
+          setDrawingFinished(true);
         });
     }
   };
-
   const onChangeValue = (region: {
     latitude: React.SetStateAction<number>;
     longitude: React.SetStateAction<number>;
@@ -122,6 +130,11 @@ function Main() {
     requestLocationPermission();
     handlePressLocation();
   }, []);
+
+  const handlePressClear = () => {
+    setMarkers([]);
+    setDrawingFinished(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -151,6 +164,12 @@ function Main() {
             strokeWidth={1}
           />
         )}
+        {drawingFinished && (
+          <Polygon
+            coordinates={polygonCoordinates}
+            fillColor="rgba(255, 0, 0, 0.5)"
+          />
+        )}
       </MapView>
       <View
         style={{
@@ -171,7 +190,7 @@ function Main() {
           onPressMinus={handlePressMinus}
           onPressLocation={handlePressLocation}
           onPressMarker={handlePressMarker}
-          onPressClear={() => setMarkers([])}
+          onPressClear={handlePressClear}
         />
       </View>
     </View>
